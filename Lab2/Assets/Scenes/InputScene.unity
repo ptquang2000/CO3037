@@ -1149,25 +1149,24 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4d11e218a12b8fba29996610a2bea20f, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  brokerAddress: broker.emqx.io
+  brokerAddress: demo.thingsboard.io
   brokerPort: 1883
   isEncrypted: 0
   connectionDelay: 500
   timeoutOnConnection: 30000
   autoConnect: 0
-  mqttUserName: 
+  mqttUserName: ALijlvbiUqTZJ4G710q3
   mqttPassword: 
   autoTest: 0
   errorReport: {fileID: 1689037942}
-  encryptedToggle: {fileID: 0}
+  temperatureValue: {fileID: 0}
+  humidityValue: {fileID: 0}
+  ledToggle: {fileID: 0}
+  pumpToggle: {fileID: 0}
   addressInputField: {fileID: 1391620359}
   usernameInputField: {fileID: 679577114}
   passwordInputField: {fileID: 401477537}
-  portInputField: {fileID: 0}
   connectButton: {fileID: 1495884056}
-  disconnectButton: {fileID: 0}
-  testPublishButton: {fileID: 0}
-  clearButton: {fileID: 0}
 --- !u!4 &1238141321
 Transform:
   m_ObjectHideFlags: 0

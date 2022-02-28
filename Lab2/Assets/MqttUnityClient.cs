@@ -40,7 +40,7 @@ public class MqttUnityClient : M2MqttUnityClient
     public void PublishTopics()
     {
         string msg = JsonUtility.ToJson(new sendMsg(this.ledToggle.isOn, this.pumpToggle.isOn));
-        client.Publish("v1/devices/me/telemetry", System.Text.Encoding.UTF8.GetBytes(msg), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
+        client.Publish("v1/devices/me/attributes", System.Text.Encoding.UTF8.GetBytes(msg), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, false);
         Debug.Log("Publishing " + msg);
         AddUiMessage("Test message published.");
     }
