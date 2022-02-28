@@ -1120,6 +1120,68 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1099695205}
   m_CullTransparentMesh: 1
+--- !u!1 &1238141319
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1238141321}
+  - component: {fileID: 1238141320}
+  m_Layer: 0
+  m_Name: MqttClient
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &1238141320
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1238141319}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 4d11e218a12b8fba29996610a2bea20f, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  brokerAddress: broker.emqx.io
+  brokerPort: 1883
+  isEncrypted: 0
+  connectionDelay: 500
+  timeoutOnConnection: 30000
+  autoConnect: 0
+  mqttUserName: 
+  mqttPassword: 
+  autoTest: 0
+  errorReport: {fileID: 1689037942}
+  encryptedToggle: {fileID: 0}
+  addressInputField: {fileID: 1391620359}
+  usernameInputField: {fileID: 679577114}
+  passwordInputField: {fileID: 401477537}
+  portInputField: {fileID: 0}
+  connectButton: {fileID: 1495884056}
+  disconnectButton: {fileID: 0}
+  testPublishButton: {fileID: 0}
+  clearButton: {fileID: 0}
+--- !u!4 &1238141321
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1238141319}
+  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
+  m_LocalPosition: {x: 534.78723, y: 961.5508, z: -54.37981}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 3
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1295059956
 GameObject:
   m_ObjectHideFlags: 0
@@ -1352,7 +1414,6 @@ GameObject:
   - component: {fileID: 1354550247}
   - component: {fileID: 1354550246}
   - component: {fileID: 1354550245}
-  - component: {fileID: 1354550249}
   m_Layer: 5
   m_Name: Canvas
   m_TagString: Untagged
@@ -1451,22 +1512,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 0, y: 0}
   m_Pivot: {x: 0, y: 0}
---- !u!114 &1354550249
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1354550244}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 4d11e218a12b8fba29996610a2bea20f, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  brokerURIInputField: {fileID: 1391620359}
-  usernameInputField: {fileID: 679577114}
-  passwordInputField: {fileID: 401477537}
-  errorReport: {fileID: 0}
 --- !u!1 &1391620357
 GameObject:
   m_ObjectHideFlags: 0
@@ -1772,9 +1817,9 @@ MonoBehaviour:
   m_OnClick:
     m_PersistentCalls:
       m_Calls:
-      - m_Target: {fileID: 1354550249}
+      - m_Target: {fileID: 1238141320}
         m_TargetAssemblyTypeName: MqttUnityClient, Assembly-CSharp
-        m_MethodName: connect
+        m_MethodName: connectBtnOnClickStart
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
