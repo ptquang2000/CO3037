@@ -153,6 +153,16 @@ public class MqttUnityClient : M2MqttUnityClient
             addressInputField.interactable = connectButton.interactable;
             addressInputField.text = brokerAddress;
         }
+        if (usernameInputField != null && connectButton != null)
+        {
+            usernameInputField.interactable = connectButton.interactable;
+            usernameInputField.text = mqttUserName;
+        }
+        if (passwordInputField != null && connectButton != null)
+        {
+            passwordInputField.interactable = connectButton.interactable;
+            passwordInputField.text = mqttPassword;
+        }
         updateUI = false;
     }
 
