@@ -90,11 +90,20 @@ namespace ChuongGa
                     case "mode_fan_auto":
                         if (_data.ss_value == "1") { 
                             ModeAuto.isOn = true;
-                            LampControl.interactable = false;
+                            LampControl.GetComponentInChildren<Button>().interactable = false;
                         }
                         else { 
                             ModeAuto.isOn = false;
-                            LampControl.interactable = true;
+                            LampControl.GetComponentInChildren<Button>().interactable = true;
+                        }
+                        break;
+                    
+                    case "fan_status":
+                        if (_data.ss_value == "1") {
+                            LampControl.isOn = true;
+                        }
+                        else {
+                            LampControl.isOn = false;
                         }
                         break;
                     //case "device_status":
@@ -108,14 +117,13 @@ namespace ChuongGa
             }
             if(_status_data.device_status=="1")
                 _btn_config.interactable = true;
-
         }
 
         public void Update_Control(ControlFan_Data _control_data)
         {
             if (_control_data.device_status == 1)
             {
-                LampControl.interactable = true;
+                LampControl.GetComponentInChildren<Button>().interactable = true;
                 if (_control_data.fan_status == 1)
                     LampControl.isOn = true;
                 else
@@ -127,7 +135,7 @@ namespace ChuongGa
         {
             _controlFan.device_status = 0;
             _controlFan.fan_status = (LampControl.isOn ? 1 : 0);
-            LampControl.interactable = false;
+            LampControl.GetComponentInChildren<Button>().interactable = false;
             return _controlFan;
         }
 

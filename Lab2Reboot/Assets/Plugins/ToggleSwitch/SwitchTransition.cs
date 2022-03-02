@@ -7,6 +7,7 @@ public class SwitchTransition : MonoBehaviour
 {
     public Toggle toggle;
     public Image sw;
+    public Button button;
     public int offButtonPosition;
     public int onButtonPosition;
     public Color offColor;

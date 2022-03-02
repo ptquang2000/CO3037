@@ -53,6 +53,7 @@ namespace ChuongGa
 
 
         public string msg_received_from_topic_status = "";
+        public string msg_received_from_topic_config = "";
         public string msg_received_from_topic_control = "";
 
         private List<string> eventMessages = new List<string>();
@@ -80,8 +81,6 @@ namespace ChuongGa
             string msg_config = JsonConvert.SerializeObject(_controlFan_data);
             client.Publish(topics[2], System.Text.Encoding.UTF8.GetBytes(msg_config), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
             Debug.Log("publish fan");
-
-
         }
 
         public void SetEncrypted(bool isEncrypted)
@@ -161,6 +160,7 @@ namespace ChuongGa
 
             if (topic == topics[2])
                 ProcessMessageControl(msg);
+
         }
 
         private void ProcessMessageStatus(string msg)
@@ -170,6 +170,7 @@ namespace ChuongGa
             GetComponent<ChuongGaManager>().Update_Status(_status_data);
 
         }
+
 
         private void ProcessMessageControl(string msg)
         {

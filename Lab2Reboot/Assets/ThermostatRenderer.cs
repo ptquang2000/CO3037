@@ -12,7 +12,7 @@ public class ThermostatRenderer : MonoBehaviour
     public int height;
     public int max = 100;
     private Image[] images;
-    private Color offColor = new Color32(0,0,0,255);
+    private Color offColor = new Color32(36,41,66,255);
     private Color onColor = new Color32(70,45,177,255);
     private float curPercentage;
     
