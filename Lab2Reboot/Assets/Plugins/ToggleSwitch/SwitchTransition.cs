@@ -6,8 +6,7 @@ using UnityEngine.UI;
 public class SwitchTransition : MonoBehaviour
 {
     public Toggle toggle;
-    public Image sw;
-    public Button button;
+    public Image swImage;
     public int offButtonPosition;
     public int onButtonPosition;
     public Color offColor;
@@ -18,7 +17,6 @@ public class SwitchTransition : MonoBehaviour
     {
         this.offColor.a = 1;
         this.onColor.a = 1;
-        this.toggle.interactable = false;
         onValueChange();
     }
 
@@ -27,22 +25,11 @@ public class SwitchTransition : MonoBehaviour
     {
     }
 
-    public void updateSwitchStatus()
-    {
-        if (this.toggle.isOn) 
-        {
-            this.toggle.isOn = false;
-        } else 
-        {
-            this.toggle.isOn = true;
-        }
-    }
-
     public void onValueChange()
     {
         Vector3 targetPos;
         Color targetColor;
-        if (this.toggle.isOn) 
+        if (this.toggle.isOn == true)
         {
             targetPos = new Vector3(this.onButtonPosition, 0, 0);
             targetColor = this.onColor;
@@ -51,7 +38,7 @@ public class SwitchTransition : MonoBehaviour
             targetPos = new Vector3(this.offButtonPosition, 0, 0);
             targetColor = this.offColor;
         }
-        sw.transform.localPosition = targetPos;
-        sw.color = targetColor;
+        swImage.transform.localPosition = targetPos;
+        swImage.color = targetColor;
     }
 }

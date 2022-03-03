@@ -59,13 +59,13 @@ public class ThermostatRenderer : MonoBehaviour
             for (int i = (int) curPercentage; i <= (int) start; ++i)
             {
                 images[i].color = onColor;
-                yield return new WaitForSeconds(0.05f);
+                yield return new WaitForSeconds(0.1f);
             }
 
         } else for (int i = steps; i >= (int) start; --i)
         {
             images[i].color = offColor;
-            yield return new WaitForSeconds(0.05f);
+            yield return new WaitForSeconds(0.1f);
         }
         curPercentage = start;
     }

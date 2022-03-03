@@ -10,6 +10,7 @@ using Newtonsoft.Json.Linq;
 using System.Linq;
 using Newtonsoft.Json;
 
+
 namespace ChuongGa
 {
     public class Status_Data
@@ -53,8 +54,8 @@ namespace ChuongGa
 
 
         public string msg_received_from_topic_status = "";
-        public string msg_received_from_topic_config = "";
         public string msg_received_from_topic_control = "";
+
 
         private List<string> eventMessages = new List<string>();
         [SerializeField]
@@ -77,10 +78,13 @@ namespace ChuongGa
 
         public void PublishFan()
         {
-            _controlFan_data = GetComponent<ChuongGaManager>().Update_ControlFan_Value(_controlFan_data);
+            _controlFan_data = new ControlFan_Data();
+            GetComponent<ChuongGaManager>().Update_ControlFan_Value(_controlFan_data);
             string msg_config = JsonConvert.SerializeObject(_controlFan_data);
             client.Publish(topics[2], System.Text.Encoding.UTF8.GetBytes(msg_config), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
             Debug.Log("publish fan");
+
+
         }
 
         public void SetEncrypted(bool isEncrypted)
@@ -153,14 +157,13 @@ namespace ChuongGa
         protected override void DecodeMessage(string topic, byte[] message)
         {
             string msg = System.Text.Encoding.UTF8.GetString(message);
-            Debug.Log("Received: " + msg + " From: " + topic);
+            Debug.Log("Received: " + msg);
             //StoreMessage(msg);
             if (topic == topics[0])
                 ProcessMessageStatus(msg);
 
             if (topic == topics[2])
                 ProcessMessageControl(msg);
-
         }
 
         private void ProcessMessageStatus(string msg)
@@ -170,7 +173,6 @@ namespace ChuongGa
             GetComponent<ChuongGaManager>().Update_Status(_status_data);
 
         }
-
 
         private void ProcessMessageControl(string msg)
         {
@@ -200,7 +202,12 @@ namespace ChuongGa
 
         public void UpdateControl()
         {
-
+            _config_data = new Config_Data();
+            GetComponent<ChuongGaManager>().Update_Config_Value(_config_data);
+            if (_config_data.mode_fan_auto == 0)
+            {
+                PublishFan();
+            }
         }
     }
 }
