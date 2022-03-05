@@ -11,25 +11,22 @@ public class ThermostatRenderer : MonoBehaviour
     public int width;
     public int height;
     public int max = 100;
+    public Image relative;
     private Image[] images;
     private Color offColor = new Color32(36,41,66,255);
     private Color onColor = new Color32(70,45,177,255);
-    private float curPercentage;
+    private int curPc;
+    private int newPc;
     
     // Start is called before the first frame update
     void Start()
     {
         RenderCircle();
-        curPercentage = max;
-    }
-
-    // Update is called once per frame
-    void Update()
-    {
     }
 
     public void RenderCircle()
     {
+        curPc = steps;
         images = new Image[steps+1];
         for (int i = steps / 2 + 2 * offset, j = 0; j <= steps; i++, j++){
             
@@ -41,33 +38,38 @@ public class ThermostatRenderer : MonoBehaviour
             var img = circle.AddComponent<Image>();
             img.sprite = Resources.Load<Sprite>("pill");
             img.rectTransform.sizeDelta = new Vector2(width, height);
-            img.color = new Color32(70, 45, 177, 255);
+            img.color = onColor;
             images[j] = img;
         
-            circle.transform.SetParent(transform);
+            circle.transform.SetParent(relative.transform);
             circle.transform.localPosition = new Vector3(x, y, 0);
-            var rotation = Quaternion.LookRotation(Vector3.forward, circle.transform.position - transform.position);
+            var rotation = Quaternion.LookRotation(Vector3.forward, circle.transform.position - relative.transform.position);
             circle.transform.rotation = rotation;
         }
     }
 
     IEnumerator _IEupdateThermostat(float value)
     {
-        float start = value / max * (steps + 1);
-        if ((int) start != 0 && curPercentage < start)
+        newPc =  (int)(value / max * (steps + 1));
+        if (curPc < newPc)
         {
-            for (int i = (int) curPercentage; i <= (int) start; ++i)
+            for (int i = curPc; i < newPc; ++i)
+            // for (int i = 0; i < (int) newPercentage; ++i)
             {
                 images[i].color = onColor;
-                yield return new WaitForSeconds(0.1f);
+                yield return new WaitForSeconds(0.025f);
             }
 
-        } else for (int i = steps; i >= (int) start; --i)
+        } else 
         {
-            images[i].color = offColor;
-            yield return new WaitForSeconds(0.1f);
+            for (int i = curPc; i > newPc; --i)
+            // for (int i = steps; i > (int) newPercentage; --i)
+            {
+                images[i].color = offColor;
+                yield return new WaitForSeconds(0.025f);
+            }
         }
-        curPercentage = start;
+        curPc = newPc;
     }
 
     public void updateThermostat(float value)

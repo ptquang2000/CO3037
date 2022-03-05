@@ -93,4 +93,4 @@ def publish(device_status=0):
 
 while True:
     publish()
-    time.sleep(10)
+    time.sleep(2)
