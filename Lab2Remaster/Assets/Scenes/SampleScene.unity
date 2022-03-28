@@ -654,28 +654,26 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rangeY: 100
-  rangeX: 9
-  interval: 0.5
+  rangeX: 7
+  interval: 2
   container: {fileID: 1524773718}
   pointTextSize: 28
   pointTextOffset: 10
-  unitOffset: -30
-  pointOffset: 50
+  unitOffset: 30
+  borderOffset: 50
   pointWidth: 20
-  fontSize: 42
+  fontSize: 21
   unitColor:
     serializedVersion: 2
     rgba: 4294967295
-  pointColor1:
-    serializedVersion: 2
-    rgba: 4279213583
-  pointColor2:
-    serializedVersion: 2
-    rgba: 4287388215
-  lr1: {fileID: 1459521664}
-  lr2: {fileID: 1831326541}
-  waitQueue1: []
-  waitQueue2: []
+  pointColor:
+  - serializedVersion: 2
+    rgba: 510471
+  - serializedVersion: 2
+    rgba: 14188613
+  lines:
+  - {fileID: 1459521664}
+  - {fileID: 1831326541}
 --- !u!1 &327159869
 GameObject:
   m_ObjectHideFlags: 0
@@ -2767,9 +2765,7 @@ LineRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Positions:
-  - {x: 1, y: 0, z: 0}
-  - {x: 1, y: 1, z: 1}
+  m_Positions: []
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -3946,9 +3942,7 @@ LineRenderer:
   m_SortingLayerID: 0
   m_SortingLayer: 0
   m_SortingOrder: 1
-  m_Positions:
-  - {x: -1, y: 0, z: 0}
-  - {x: -1, y: 1, z: 1}
+  m_Positions: []
   m_Parameters:
     serializedVersion: 3
     widthMultiplier: 1
@@ -4233,9 +4227,9 @@ MonoBehaviour:
   connectButton: {fileID: 676064467}
   graphController: {fileID: 194440014}
   topics:
-  - /bkiot/1813678_ID/status
-  - /bkiot/1813678_ID/led
-  - /bkiot/1813678_ID/pump
+  - /bkiot/1813678/status
+  - /bkiot/1813678/led
+  - /bkiot/1813678/pump
   canvasScene1: {fileID: 1930998945}
   canvasScene2: {fileID: 2004496667}
   offsetPositionX: 1080

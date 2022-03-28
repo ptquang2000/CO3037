@@ -10,9 +10,9 @@ using M2MqttUnity;
 [Serializable]
 public class DataControl {
     public string device;
-    public bool status;
+    public string status;
 
-    public DataControl(string name, bool isOn)
+    public DataControl(string name, string isOn)
     {
         device = name;
         status = isOn;
@@ -20,14 +20,24 @@ public class DataControl {
 }
 
 [Serializable]
-public class DataStatus {
-    public float temperature;
-    public float humidity;
-    public DataStatus (float agr1, float agr2)
-    {
-        temperature = agr1;
-        humidity = agr2;
-    }
+public class data_ss {
+    public string ss_name;
+    public string ss_unit;
+    public string ss_value;
+}
+
+[Serializable]
+public class DataCollection {
+    public string project_id;
+    public string project_name;
+    public string station_id;
+    public string station_name;
+    public string longitude;
+    public string latitude;
+    public string volt_battery;
+    public string volt_solar;
+    public List<data_ss> data_ss;
+    public string device_status;
 }
 
 public class MqttUnityClient : M2MqttUnityClient
@@ -59,14 +69,14 @@ public class MqttUnityClient : M2MqttUnityClient
     public void onValueChangeLed()
     {
         ledToggle.interactable = false;
-        string msg = JsonUtility.ToJson(new DataControl("LED", this.ledToggle.isOn));
+        string msg = JsonUtility.ToJson(new DataControl("LED", this.ledToggle.isOn ? "ON" : "OFF"));
         PublishTopics(topics[1], msg);
     }
 
     public void onValueChangePump()
     {
         pumpToggle.interactable = false;
-        string msg = JsonUtility.ToJson(new DataControl("PUMP", this.pumpToggle.isOn));
+        string msg = JsonUtility.ToJson(new DataControl("PUMP", this.pumpToggle.isOn ? "ON": "OFF"));
         PublishTopics(topics[2], msg);
     }
 
@@ -128,14 +138,11 @@ public class MqttUnityClient : M2MqttUnityClient
         // client.Publish(topics[0], System.Text.Encoding.UTF8.GetBytes(JsonUtility.ToJson(new DataStatus(31f, 70f))), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
 
         SwitchScene();
-        GetData();
     }
 
     protected override void SubscribeTopics()
     {
         client.Subscribe(new string[] { topics[0] }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
-        client.Subscribe(new string[] { topics[1] }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
-        client.Subscribe(new string[] { topics[2] }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
     }
 
     protected override void UnsubscribeTopics()
@@ -215,18 +222,6 @@ public class MqttUnityClient : M2MqttUnityClient
 
         if (String.Equals(topics[0], topic))
             StoreMessage(msg);
-        else if (String.Equals(topics[1], topic))
-        {
-            DataControl data = JsonUtility.FromJson<DataControl>(msg);
-            ledToggle.isOn = data.status;
-            ledToggle.interactable = true;
-        }
-        else if (String.Equals(topics[2], topic))
-        {
-            DataControl data = JsonUtility.FromJson<DataControl>(msg);
-            pumpToggle.isOn = data.status;
-            pumpToggle.interactable = true;
-        }
     }
 
     private void StoreMessage(string eventMsg)
@@ -237,15 +232,54 @@ public class MqttUnityClient : M2MqttUnityClient
     private void ProcessMessage(string msg)
     {
         AddUiMessage("Received: " + msg);
-        DataStatus data = JsonUtility.FromJson<DataStatus>(msg);
-        if (this.temperatureValue != null)
+        DataCollection _status_data = JsonUtility.FromJson<DataCollection>(msg);
+        float temperature = 0.0f, humidity = 0.0f;
+        foreach(data_ss _data in _status_data.data_ss)
         {
-            this.temperatureValue.text = (data.temperature).ToString() + " °C";
+            switch (_data.ss_name)
+            {
+                case "temperature": 
+                    if (this.temperatureValue != null)
+                    {
+                        float value = float.Parse(_data.ss_value);
+                        this.temperatureValue.text = ((int) value).ToString() + "°C";
+                        temperature = value;
+                    }
+                    break;
+                case "humidity": 
+                    if (this.humidityValue != null)
+                    {
+                        float value = float.Parse(_data.ss_value);
+                        this.humidityValue.text = ((int) value).ToString() + "%";
+                        humidity = value;
+                    }
+                    break;
+                case "led_status":
+                    if (_status_data.device_status == "1" && !ledToggle.interactable)
+                    {
+                        bool isTrue = _data.ss_value == "ON" ^ ledToggle.isOn;
+                        // if not the same (true) publish again
+                        if (!isTrue)
+                            ledToggle.interactable = true;
+                        else
+                            onValueChangeLed();
+                    }
+                    break;
+                case "pump_status":
+                    if (_status_data.device_status == "1" && !pumpToggle.interactable)
+                    {
+                        bool isTrue = _data.ss_value  == "ON" ^ pumpToggle.isOn;
+                        // if not the same (true) publish again
+                        if (!isTrue)
+                            pumpToggle.interactable = true;
+                        else
+                            onValueChangePump();
+                    }
+                    break;
+            }
         }
-        if (this.humidityValue != null)
-        {
-            this.humidityValue.text = (data.humidity).ToString() + " %";
-        }
+
+        graphController.UpdateData(temperature, humidity);
     }
 
     protected override void Update()
@@ -334,20 +368,4 @@ public class MqttUnityClient : M2MqttUnityClient
         }
     }
 
-    IEnumerator _GetData()
-    {
-        while (true)
-        {
-            float value = float.Parse(temperatureValue.text.Split(' ')[0]);
-            graphController.UpdateData(graphController.waitQueue1, value);
-            value = float.Parse(humidityValue.text.Split(' ')[0]);
-            graphController.UpdateData(graphController.waitQueue2, value);
-            yield return new WaitForSeconds(graphController.interval);
-        }
-    }
-
-    void GetData()
-    {
-        StartCoroutine(_GetData());
-    }
 }
