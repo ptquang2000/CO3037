@@ -30,7 +30,7 @@ class Point {
         return point.transform.position; 
     }
     
-    public Point(GameObject go, Transform parent, float value, Color32 color)
+    public Point(GameObject go, Transform parent, float value)
     {
         point = go;
         
@@ -41,18 +41,17 @@ class Point {
             {
                 case "Point":
                     pointImg = child.GetComponent<Image>(); 
-                    pointImg.color = color;
                 break;
 
                 case "X":
                     xText = child.GetComponent<Text>(); 
-                    xText.text = System.DateTime.Now.ToString("mm:ss");
+                    // xText.text = System.DateTime.Now.ToString("hh:mm:ss");
                     x = Time.time;
                 break;
 
                 case "Y":
                     yText = child.GetComponent<Text>(); 
-                    yText.text = ((int) value).ToString();
+                    // yText.text = ((int) value).ToString();
                     y = value;
                 break;
             }
@@ -71,19 +70,13 @@ public class GraphController : MonoBehaviour
     public Image container;
     public int borderOffset;
 
-    public List<Color32> pointColor;
+    public List<string> prefabs;
     public List<LineRenderer> lines = new List<LineRenderer>();
     private List<List<Point>> points = new List<List<Point>>();
     private float xMax = 0.0f;
     private float yMax = 0.0f;
     // Start is called before the first frame update
     void Start()
-    {
-        SetupGraph();
-        // GenerateData();
-    }
-
-    void SetupGraph()
     {
         yMax = container.rectTransform.sizeDelta.y - 2 * borderOffset;
         xMax = container.rectTransform.sizeDelta.x - 2 * borderOffset;
@@ -92,21 +85,11 @@ public class GraphController : MonoBehaviour
             lines[j].positionCount = 0;
             points.Add(new List<Point>());
         }
+        // GenerateData();
     }
+
 
     void Update()
-    {
-        for (int i = 0; i < lines.Count; i++)
-        {
-            lines[i].positionCount = points[i].Count;
-            for (int j = 0; j < lines[i].positionCount; j++)
-            {
-                lines[i].SetPosition(j, points[i][j].getPosition());
-            }
-        }
-    }
-
-    void UpdateGraph()
     {
         for (int i = 0; i < lines.Count; i++)
         {
@@ -121,6 +104,12 @@ public class GraphController : MonoBehaviour
                 pt[j].setLocalPosition(new Vector3(xIndex, yIndex, 0));
                 pt[j].setXTextPosition(container.transform.position.y - xTextOffset);
             }
+
+            lines[i].positionCount = points[i].Count;
+            for (int j = 0; j < lines[i].positionCount; j++)
+            {
+                lines[i].SetPosition(j, points[i][j].getPosition());
+            }
         }
     }
 
@@ -132,10 +121,10 @@ public class GraphController : MonoBehaviour
             if (points[i].Count == rangeX) points[i].RemoveAt(0);
 
             Point point = new Point(
-                Instantiate(Resources.Load("Point")) as GameObject,
+                Instantiate(Resources.Load(prefabs[i])) as GameObject,
                 container.transform,
-                data[i],
-                pointColor[i]);
+                data[i]
+            );
             
             points[i].Add(point);
 
@@ -153,7 +142,6 @@ public class GraphController : MonoBehaviour
                 Destroy(removePt);
             }
         }
-        UpdateGraph();
     }
 
     IEnumerator _GenerateData()

@@ -654,16 +654,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   rangeY: 100
-  rangeX: 9
+  rangeX: 20
   interval: 1
   xTextOffset: 1.75
   container: {fileID: 1524773718}
   borderOffset: 50
-  pointColor:
-  - serializedVersion: 2
-    rgba: 4278700551
-  - serializedVersion: 2
-    rgba: 4292378693
+  prefabs:
+  - Graph/Point1
+  - Graph/Point2
   lines:
   - {fileID: 1459521664}
   - {fileID: 1831326541}
