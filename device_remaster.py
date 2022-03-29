@@ -86,4 +86,4 @@ def publish(device_status=0):
 
 while True:
     publish()
-    time.sleep(random.randint(0, 4))
+    time.sleep(random.randint(1, 4))

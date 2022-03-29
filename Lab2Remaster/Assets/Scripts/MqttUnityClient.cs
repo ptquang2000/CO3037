@@ -62,7 +62,7 @@ public class MqttUnityClient : M2MqttUnityClient
     public void PublishTopics(String topic, String msg)
     {
         client.Publish(topic, System.Text.Encoding.UTF8.GetBytes(msg), MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE, true);
-        Debug.Log("Publishing " + msg);
+        // Debug.Log("Publishing " + msg);
         AddUiMessage("Test message published.");
     }
 
@@ -218,7 +218,7 @@ public class MqttUnityClient : M2MqttUnityClient
     protected override void DecodeMessage(string topic, byte[] message)
     {
         string msg = System.Text.Encoding.UTF8.GetString(message);
-        Debug.Log("Received: " + msg);
+        // Debug.Log("Received: " + msg);
 
         if (String.Equals(topics[0], topic))
             StoreMessage(msg);
@@ -233,7 +233,7 @@ public class MqttUnityClient : M2MqttUnityClient
     {
         AddUiMessage("Received: " + msg);
         DataCollection _status_data = JsonUtility.FromJson<DataCollection>(msg);
-        float temperature = 0.0f, humidity = 0.0f;
+        List<float> data = new List<float>(new float[]{0.0f, 0.0f});
         foreach(data_ss _data in _status_data.data_ss)
         {
             switch (_data.ss_name)
@@ -243,7 +243,7 @@ public class MqttUnityClient : M2MqttUnityClient
                     {
                         float value = float.Parse(_data.ss_value);
                         this.temperatureValue.text = ((int) value).ToString() + "°C";
-                        temperature = value;
+                        data[0] = value;
                     }
                     break;
                 case "humidity": 
@@ -251,7 +251,7 @@ public class MqttUnityClient : M2MqttUnityClient
                     {
                         float value = float.Parse(_data.ss_value);
                         this.humidityValue.text = ((int) value).ToString() + "%";
-                        humidity = value;
+                        data[1] = value;
                     }
                     break;
                 case "led_status":
@@ -278,8 +278,7 @@ public class MqttUnityClient : M2MqttUnityClient
                     break;
             }
         }
-
-        graphController.UpdateData(temperature, humidity);
+        graphController.UpdateData(data);
     }
 
     protected override void Update()
