@@ -2,60 +2,139 @@ print("Xin chào ThingsBoard")
 import paho.mqtt.client as mqttclient
 import time
 import json
-import subprocess
-
-BROKER_ADDRESS = "demo.thingsboard.io"
-PORT = 1883
-THINGS_BOARD_ACCESS_TOKEN = "ALijlvbiUqTZJ4G710q3"
+import serial.tools.list_ports
+import traceback
 
 
-def subscribed(client, userdata, mid, granted_qos):
-    print("Subscribed...")
+# !1:HUMI:80##!1:TEMP:20##
+# !1:HUMI:80##
+# !1:TEMP:20##
 
 
-def recv_message(client, userdata, message):
-    print("Received: ", message.payload.decode("utf-8"))
-    temp_data = {'value': True}
-    try:
-        jsonobj = json.loads(message.payload)
-        if jsonobj['method'] == "setValue":
+class SerialPort:
+
+    def __init__(self, port, baudrate=115200):
+        self._mess = ""
+        self._bbc_port = port
+        self._baudrate = baudrate
+        if len(self._bbc_port) > 0:
+            self._ser = serial.Serial(port=self._bbc_port, baudrate=baudrate)
+
+        self._collected_data = {
+            'humidity': 0,
+            'temperature': 0,
+            'light': 60,
+            'longitude': 106.661136,
+            'latitude': 10.773261,
+        }
+        self._DATA = {
+            'HUMI': 'humidity',
+            'TEMP': 'temperature',
+        }
+        self._METHOD = {
+            'setLED': 'LED',
+            'setPUMP': 'PUMP',
+        }
+
+
+    def writeSerial(self, rc_data):
+        if self._ser:
+            data = f"1:{self._METHOD[rc_data['method']]}:{1 if rc_data['params'] else 0}#"
+            print("Sent " + data)
+            self._ser.write(data.encode())
+
+
+    def processData(self, data):
+        data = data.replace("!", "")
+        data = data.replace("#", "")
+        splitData = data.split(":")
+        print(splitData)
+        self._collected_data[self._DATA[splitData[1]]] = int(splitData[2])
+
+
+    def readSerial(self):
+        bytesToRead = self._ser.inWaiting()
+        if (bytesToRead > 0):
+            self._mess = self._mess + self._ser.read(bytesToRead).decode("UTF-8")
+            while ("#" in self._mess) and ("!" in self._mess):
+                start = self._mess.find("!")
+                end = self._mess.find("#")
+                self.processData(self._mess[start:end + 1])
+                if (end == len(self._mess)):
+                    self._mess = ""
+                else:
+                    self._mess = self._mess[end+1:]
+            return True
+
+
+    @property
+    def collected_data(self):
+        return json.dumps(self._collected_data)
+
+
+class ThingsBoardClient:
+
+    def __init__(self, addr, token, port=1883, com="COM3"):
+        self._addr = addr
+        self._port = port
+        self._token = token
+
+        self._sp = SerialPort(com)
+        self._setup()
+
+    
+    def _setup(self):
+        self._client = mqttclient.Client("Gateway_Thingsboard")
+        self._client.username_pw_set(self._token)
+
+        self._client.on_connect = self._connected
+        self._client.connect(self._addr, self._port)
+
+        self._client.on_subscribe = self._subscribed
+        self._client.on_message = self._recv_message
+
+
+    def _subscribed(self, client, userdata, mid, granted_qos):
+        print("Subscribed...")
+
+
+    def _recv_message(self, client, userdata, message):
+        print("Received: ", message.payload.decode("utf-8"))
+        temp_data = {'value': True}
+        try:
+            jsonobj = json.loads(message.payload)
+            # if jsonobj['method'] == "setValue":
             temp_data['value'] = jsonobj['params']
             client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
-    except:
-        pass
+            self._sp.writeSerial(jsonobj)
+        except:
+            pass
 
 
-def connected(client, usedata, flags, rc):
-    if rc == 0:
-        print("Thingsboard connected successfully!!")
-        client.subscribe("v1/devices/me/rpc/request/+")
-    else:
-        print("Connection is failed")
+    def _connected(self, client, usedata, flags, rc):
+        if rc == 0:
+            print("Thingsboard connected successfully!!")
+            client.subscribe("v1/devices/me/rpc/request/+")
+        else:
+            print("Connection is failed")
+
+    
+    def run(self, delay=1):
+        self._client.loop_start()
+
+        while True:
+            if self._sp.readSerial():
+                self._client.publish('v1/devices/me/telemetry', self._sp.collected_data, 1)
+            time.sleep(delay)
 
 
-client = mqttclient.Client("Gateway_Thingsboard")
-client.username_pw_set(THINGS_BOARD_ACCESS_TOKEN)
+def main():
+    client = ThingsBoardClient(BROKER_ADDRESS, THINGS_BOARD_ACCESS_TOKEN)
+    client.run()
 
-client.on_connect = connected
-client.connect(BROKER_ADDRESS, 1883)
-client.loop_start()
-
-client.on_subscribe = subscribed
-client.on_message = recv_message
-
-def get_coord():
-    p1 = subprocess.run(['curl', 'ipinfo.io/loc'], capture_output=True)
-    return p1.stdout.decode()[:-1].split(',')
-
-temp = 30
-humi = 50
-light_intesity = 100
-counter = 0
-while True:
-    coord = get_coord()
-    collect_data = {'temperature': temp, 'humidity': humi, 'light':light_intesity, 'longitude': coord[1], 'latitude': coord[0]}
-    temp += 1
-    humi += 1
-    light_intesity += 1
-    client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
-    time.sleep(10)
+    
+if __name__ == '__main__':
+    BROKER_ADDRESS = "demo.thingsboard.io"
+    PORT = 1883
+    THINGS_BOARD_ACCESS_TOKEN = "ALijlvbiUqTZJ4G710q3"
+    main()
