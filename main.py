@@ -1,14 +1,7 @@
-print("Xin chào ThingsBoard")
 import paho.mqtt.client as mqttclient
 import time
 import json
 import serial.tools.list_ports
-import traceback
-
-
-# !1:HUMI:80##!1:TEMP:20##
-# !1:HUMI:80##
-# !1:TEMP:20##
 
 
 class SerialPort:
@@ -44,7 +37,7 @@ class SerialPort:
             self._ser.write(data.encode())
 
 
-    def processData(self, data):
+    def _processData(self, data):
         data = data.replace("!", "")
         data = data.replace("#", "")
         splitData = data.split(":")
@@ -59,7 +52,7 @@ class SerialPort:
             while ("#" in self._mess) and ("!" in self._mess):
                 start = self._mess.find("!")
                 end = self._mess.find("#")
-                self.processData(self._mess[start:end + 1])
+                self._processData(self._mess[start:end + 1])
                 if (end == len(self._mess)):
                     self._mess = ""
                 else:
@@ -103,7 +96,6 @@ class ThingsBoardClient:
         temp_data = {'value': True}
         try:
             jsonobj = json.loads(message.payload)
-            # if jsonobj['method'] == "setValue":
             temp_data['value'] = jsonobj['params']
             client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
             self._sp.writeSerial(jsonobj)
@@ -134,6 +126,7 @@ def main():
 
     
 if __name__ == '__main__':
+    print("Xin chào ThingsBoard")
     BROKER_ADDRESS = "demo.thingsboard.io"
     PORT = 1883
     THINGS_BOARD_ACCESS_TOKEN = "ALijlvbiUqTZJ4G710q3"
