@@ -1,3 +1,4 @@
+import traceback
 import paho.mqtt.client as mqttclient
 import time
 import json
@@ -32,7 +33,7 @@ class SerialPort:
 
     def writeSerial(self, rc_data):
         if self._ser:
-            data = f"1:{self._METHOD[rc_data['method']]}:{1 if rc_data['params'] else 0}#"
+            data = f"!1:{self._METHOD[rc_data['method']]}:{1 if rc_data['params'] else 0}#"
             print("Sent " + data)
             self._ser.write(data.encode())
 
@@ -113,17 +114,14 @@ class ThingsBoardClient:
     
     def run(self, delay=1):
         self._client.loop_start()
-
         while True:
             if self._sp.readSerial():
                 self._client.publish('v1/devices/me/telemetry', self._sp.collected_data, 1)
             time.sleep(delay)
 
-
 def main():
     client = ThingsBoardClient(BROKER_ADDRESS, THINGS_BOARD_ACCESS_TOKEN)
     client.run()
-
     
 if __name__ == '__main__':
     print("Xin chào ThingsBoard")
