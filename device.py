@@ -59,12 +59,12 @@ class SerialPort:
             return True
 
 
-    def _writter(self):
+    def _writter(self, delay=10):
         while True:
             self._collected_data['humidity'] = random.randint(1, 100)
             self._collected_data['temperature'] = random.randint(1, 100)
             self._serialWrite()
-            time.sleep(1)
+            time.sleep(delay)
 
     
     def run(self, delay=0.1):
