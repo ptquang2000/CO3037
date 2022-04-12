@@ -118,14 +118,16 @@ class ThingsBoardClient:
             if self._sp.readSerial():
                 self._client.publish('v1/devices/me/telemetry', self._sp.collected_data, 1)
             time.sleep(delay)
+            
 
 def main():
-    client = ThingsBoardClient(BROKER_ADDRESS, THINGS_BOARD_ACCESS_TOKEN)
-    client.run()
-    
-if __name__ == '__main__':
     print("Xin chào ThingsBoard")
     BROKER_ADDRESS = "demo.thingsboard.io"
     PORT = 1883
     THINGS_BOARD_ACCESS_TOKEN = "ALijlvbiUqTZJ4G710q3"
+    client = ThingsBoardClient(BROKER_ADDRESS, THINGS_BOARD_ACCESS_TOKEN)
+    client.run()
+
+    
+if __name__ == '__main__':
     main()
