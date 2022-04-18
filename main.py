@@ -24,6 +24,7 @@ class SerialPort:
         self._DATA = {
             'HUMI': 'humidity',
             'TEMP': 'temperature',
+            'LIGHT': 'light',
         }
         self._METHOD = {
             'setLED': 'LED',
@@ -33,7 +34,10 @@ class SerialPort:
 
     def writeSerial(self, rc_data):
         if self._ser:
-            data = f"!1:{self._METHOD[rc_data['method']]}:{1 if rc_data['params'] else 0}#"
+            if rc_data['method'] == 'setLED':
+                data = f"{1 if rc_data['params'] else 0}#"
+            elif rc_data['method'] == 'setPUMP':
+                data = f"{3 if rc_data['params'] else 2}#"
             print("Sent " + data)
             self._ser.write(data.encode())
 
@@ -44,6 +48,7 @@ class SerialPort:
         splitData = data.split(":")
         print(splitData)
         self._collected_data[self._DATA[splitData[1]]] = int(splitData[2])
+        
 
 
     def readSerial(self):
@@ -53,7 +58,10 @@ class SerialPort:
             while ("#" in self._mess) and ("!" in self._mess):
                 start = self._mess.find("!")
                 end = self._mess.find("#")
-                self._processData(self._mess[start:end + 1])
+                try:
+                    self._processData(self._mess[start:end + 1])
+                except:
+                    pass
                 if (end == len(self._mess)):
                     self._mess = ""
                 else:
@@ -68,7 +76,7 @@ class SerialPort:
 
 class ThingsBoardClient:
 
-    def __init__(self, addr, token, port=1883, com="COM3"):
+    def __init__(self, addr, token, port=1883, com="COM5"):
         self._addr = addr
         self._port = port
         self._token = token
@@ -116,7 +124,10 @@ class ThingsBoardClient:
         self._client.loop_start()
         while True:
             if self._sp.readSerial():
-                self._client.publish('v1/devices/me/telemetry', self._sp.collected_data, 1)
+                try:
+                    self._client.publish('v1/devices/me/telemetry', self._sp.collected_data, 1)
+                except IndexError:
+                    pass
             time.sleep(delay)
             
 
