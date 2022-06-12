@@ -29,6 +29,8 @@ class SerialPort:
         self._METHOD = {
             'setLED': 'LED',
             'setPUMP': 'PUMP',
+            'setLED2': 'LED2',
+            'setPUMP2': 'PUMP2',
         }
 
 
@@ -38,6 +40,10 @@ class SerialPort:
                 data = f"{1 if rc_data['params'] else 0}#"
             elif rc_data['method'] == 'setPUMP':
                 data = f"{3 if rc_data['params'] else 2}#"
+            elif rc_data['method'] == 'setLED2':
+                data = f"{5 if rc_data['params'] else 4}#"
+            elif rc_data['method'] == 'setPUMP2':
+                data = f"{7 if rc_data['params'] else 6}#"
             print("Sent " + data)
             self._ser.write(data.encode())
 
@@ -124,10 +130,7 @@ class ThingsBoardClient:
         self._client.loop_start()
         while True:
             if self._sp.readSerial():
-                try:
-                    self._client.publish('v1/devices/me/telemetry', self._sp.collected_data, 1)
-                except IndexError:
-                    pass
+                self._client.publish('v1/devices/me/telemetry', self._sp.collected_data, 1)
             time.sleep(delay)
             
 
@@ -136,7 +139,8 @@ def main():
     BROKER_ADDRESS = "demo.thingsboard.io"
     PORT = 1883
     THINGS_BOARD_ACCESS_TOKEN = "ALijlvbiUqTZJ4G710q3"
-    client = ThingsBoardClient(BROKER_ADDRESS, THINGS_BOARD_ACCESS_TOKEN)
+    COM = "COM6"
+    client = ThingsBoardClient(BROKER_ADDRESS, THINGS_BOARD_ACCESS_TOKEN, PORT, COM)
     client.run()
 
     
