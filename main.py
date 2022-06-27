@@ -139,7 +139,7 @@ def main():
     BROKER_ADDRESS = "demo.thingsboard.io"
     PORT = 1883
     THINGS_BOARD_ACCESS_TOKEN = "ALijlvbiUqTZJ4G710q3"
-    COM = "COM6"
+    COM = "COM8"
     client = ThingsBoardClient(BROKER_ADDRESS, THINGS_BOARD_ACCESS_TOKEN, PORT, COM)
     client.run()
 
